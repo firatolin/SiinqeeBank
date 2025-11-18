@@ -1,49 +1,128 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
 
 <BorderPane xmlns:fx="http://javafx.com/fxml"
             fx:controller="siinqee_banking.controller.CustomerController"
             stylesheets="@../css/style.css">
 
-    <left>
-        <VBox spacing="10" style="-fx-padding: 20; -fx-background-color: #2f4411;" prefWidth="200">
-            <Label fx:id="welcomeLabel" text="Welcome"
-                   style="-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;"/>
+    <top>
+        <VBox style="-fx-background-color: #3f5615;">
+            <HBox fx:id="headerBox" alignment="CENTER" spacing="40" style="-fx-padding: 20;">
+                <!-- Welcome Section -->
+                <VBox fx:id="welcomeBox" alignment="CENTER_LEFT" spacing="5">
+                    <Label fx:id="welcomeLabel" text="Welcome, Customer"
+                           style="-fx-text-fill: #3f5615; -fx-font-size: 18px; -fx-font-weight: bold;"/>
+                    <Label fx:id="accountNumberLabel" text="Account: "
+                           style="-fx-text-fill: #666; -fx-font-size: 14px;"/>
+                </VBox>
 
-            <Button text="Check Balance" onAction="#handleCheckBalance"
-                    style="-fx-background-color: #F4941C; -fx-text-fill: white;"/>
-            <Button text="Deposit Money" onAction="#handleDeposit"
-                    style="-fx-background-color: #F4941C; -fx-text-fill: white;"/>
-            <Button text="Withdraw Money" onAction="#handleWithdraw"
-                    style="-fx-background-color: #F4941C; -fx-text-fill: white;"/>
-            <Button text="View Transactions" onAction="#handleViewTransactions"
-                    style="-fx-background-color: #F4941C; -fx-text-fill: white;"/>
+                <Region HBox.hgrow="ALWAYS"/>
 
-            <Region VBox.vgrow="ALWAYS"/>
-            <Button text="Logout" onAction="#handleLogout"
-                    style="-fx-background-color: #dc3545; -fx-text-fill: white;"/>
-        </VBox>
-    </left>
+                <!-- Balance Section -->
+                <VBox fx:id="balanceBox" alignment="CENTER" spacing="5">
+                    <Label text="Current Balance" style="-fx-text-fill: white; -fx-font-size: 14px;"/>
+                    <Label fx:id="balanceLabel" text="ETB 0.00"
+                           style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;"/>
+                </VBox>
 
-    <center>
-        <VBox spacing="20" style="-fx-padding: 30;" alignment="CENTER">
-            <Label text="Customer Dashboard"
-                   style="-fx-text-fill: #F4941C; -fx-font-size: 24px; -fx-font-weight: bold;"/>
-
-            <Label text="Welcome to your banking dashboard"
-                   style="-fx-text-fill: rgb(63, 86, 21); -fx-font-size: 16px;"/>
-
-            <VBox spacing="10" style="-fx-padding: 20; -fx-background-color: #FFD700;">
-                <Label text="Quick Balance" style="-fx-text-fill: rgb(63, 86, 21); -fx-font-weight: bold;"/>
-                <Label text="$10,000.00" style="-fx-text-fill: #F4941C; -fx-font-size: 28px; -fx-font-weight: bold;"/>
-            </VBox>
-
-            <HBox spacing="15" alignment="CENTER">
-                <Button text="Quick Deposit" style="-fx-background-color: #FFD700; -fx-text-fill: rgb(63, 86, 21);"/>
-                <Button text="Quick Transfer" style="-fx-background-color: #FFD700; -fx-text-fill: rgb(63, 86, 21);"/>
+                <!-- Logout Section -->
+                <VBox fx:id="logoutBox" alignment="CENTER">
+                    <Button text="Logout" onAction="#handleLogout"
+                            style="-fx-background-color: #dc3545; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20;"/>
+                </VBox>
             </HBox>
         </VBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true" style="-fx-background: white;">
+            <VBox spacing="25" style="-fx-padding: 30;" alignment="TOP_CENTER">
+
+                <!-- Account Overview -->
+                <VBox styleClass="content-pane" spacing="15">
+                    <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+
+                    <Label text="👤 Account Overview" style="-fx-text-fill: #F4941C; -fx-font-size: 20px; -fx-font-weight: bold;"/>
+
+                    <GridPane hgap="15" vgap="10">
+                        <columnConstraints>
+                            <ColumnConstraints prefWidth="150"/>
+                            <ColumnConstraints prefWidth="300"/>
+                        </columnConstraints>
+
+                        <!-- Full Name -->
+                        <Label text="Full Name:" styleClass="info-label"/>
+                        <Label fx:id="fullNameLabel" text="-" style="-fx-font-weight: bold;" GridPane.columnIndex="1"/>
+
+                        <!-- Account Type -->
+                        <Label text="Account Type:" styleClass="info-label" GridPane.rowIndex="1"/>
+                        <Label fx:id="accountTypeLabel" text="-" style="-fx-font-weight: bold;" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                        <!-- Account Number -->
+                        <Label text="Account Number:" styleClass="info-label" GridPane.rowIndex="2"/>
+                        <Label fx:id="accountNumberDetailLabel" text="-" style="-fx-font-weight: bold; -fx-text-fill: #3f5615;" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+                    </GridPane>
+                </VBox>
+
+                <!-- Quick Actions -->
+                <HBox spacing="20" alignment="CENTER">
+                    <Button text="💰 Check Balance" onAction="#handleCheckBalance" styleClass="primary-button" prefWidth="180"/>
+                </HBox>
+
+                <!-- Transfer Funds -->
+                <VBox styleClass="content-pane" spacing="15">
+                    <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+
+                    <Label text="🔄 Transfer Funds" style="-fx-text-fill: #F4941C; -fx-font-size: 20px; -fx-font-weight: bold;"/>
+
+                    <VBox spacing="10">
+                        <HBox spacing="15" alignment="CENTER_LEFT">
+                            <TextField fx:id="recipientAccountField" promptText="Enter recipient account number"
+                                       styleClass="input-field" prefWidth="250"/>
+                            <Button text="🔍 Verify Account" onAction="#handleSearchRecipient"
+                                    styleClass="secondary-button"/>
+                        </HBox>
+
+                        <!-- Recipient Info (Initially hidden) -->
+                        <VBox fx:id="recipientInfoBox" spacing="5" visible="false" style="-fx-background-color: #e8f0f8; -fx-padding: 10; -fx-background-radius: 5;">
+                            <Label text="Recipient Found:" style="-fx-text-fill: #3498db; -fx-font-weight: bold;"/>
+                            <Label fx:id="recipientNameLabel" text="" style="-fx-text-fill: #2f4411; -fx-font-weight: bold;"/>
+                        </VBox>
+
+                        <HBox spacing="15" alignment="CENTER_LEFT">
+                            <TextField fx:id="transferAmountField" promptText="Amount (ETB)"
+                                       styleClass="input-field" prefWidth="200"/>
+                            <Button text="➡️ Transfer" onAction="#handleTransfer"
+                                    styleClass="primary-button" prefWidth="120"/>
+                        </HBox>
+                    </VBox>
+                </VBox>
+
+                <!-- Recent Transactions -->
+                <VBox styleClass="content-pane" spacing="15">
+                    <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+
+                    <HBox alignment="CENTER_LEFT" spacing="10">
+                        <Label text="💳 Recent Transactions" style="-fx-text-fill: #F4941C; -fx-font-size: 20px; -fx-font-weight: bold;"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button text="View All" onAction="#handleViewAllTransactions" styleClass="secondary-button"/>
+                    </HBox>
+
+                    <TableView fx:id="transactionsTable" styleClass="data-table" prefHeight="200">
+                        <columns>
+                            <TableColumn fx:id="typeColumn" text="Type" prefWidth="100"/>
+                            <TableColumn fx:id="descriptionColumn" text="Description" prefWidth="200"/>
+                            <TableColumn fx:id="amountColumn" text="Amount" prefWidth="120"/>
+                            <TableColumn fx:id="dateColumn" text="Date" prefWidth="150"/>
+                        </columns>
+                    </TableView>
+                </VBox>
+
+            </VBox>
+        </ScrollPane>
     </center>
+
 </BorderPane>

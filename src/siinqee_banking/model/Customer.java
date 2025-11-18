@@ -38,13 +38,10 @@ public class Customer {
         addTransaction("ACCOUNT_OPENING", "Account opened", balance, LocalDateTime.now());
     }
 
-    // Old constructor for backward compatibility
-    public Customer(String username, String password, double balance) {
-        this.firstName = username;
-        this.lastName = "";
-        this.gender = "";
-        this.phone = "";
-        this.address = "";
+    // SIMPLE CONSTRUCTOR - Use this for login testing
+    public Customer(String firstName, String password, double balance) {
+        this.firstName = firstName;
+        this.lastName = getLastName();
         this.password = password;
         this.accountNumber = "s" + (100000000 + (int)(Math.random() * 900000000));
         this.balance = balance;
@@ -73,6 +70,7 @@ public class Customer {
         return false;
     }
 
+    // Transfer method
     public boolean transfer(Customer recipient, double amount) {
         if (amount > 0 && amount <= balance) {
             this.balance -= amount;
@@ -89,22 +87,6 @@ public class Customer {
         return false;
     }
 
-    public boolean transfer(Customer recipient, double amount) {
-        if (amount > 0 && amount <= balance) {
-            this.balance -= amount;
-            recipient.deposit(amount);
-
-            // Add transaction for sender
-            this.addTransaction("TRANSFER_OUT", "Transfer to " + recipient.getAccountNumber(), -amount, LocalDateTime.now());
-
-            // Add transaction for recipient
-            recipient.addTransaction("TRANSFER_IN", "Transfer from " + this.getAccountNumber(), amount, LocalDateTime.now());
-
-            return true;
-        }
-        return false;
-    }
-
     // Transaction management
     public void addTransaction(String type, String description, double amount, LocalDateTime timestamp) {
         Transaction transaction = new Transaction(type, description, amount, timestamp);
@@ -112,7 +94,7 @@ public class Customer {
     }
 
     public List<Transaction> getTransactions() {
-        return new ArrayList<>(transactions); // Return a copy to prevent external modification
+        return new ArrayList<>(transactions);
     }
 
     public List<Transaction> getRecentTransactions(int count) {
@@ -120,40 +102,27 @@ public class Customer {
         return new ArrayList<>(transactions.subList(startIndex, transactions.size()));
     }
 
-    // Getters and setters for all fields
+    // Getters and setters
     public String getFirstName() { return firstName; }
-    public void setFirstName(String firstName) { this.firstName = firstName; }
-
     public String getLastName() { return lastName; }
-    public void setLastName(String lastName) { this.lastName = lastName; }
-
     public String getGender() { return gender; }
-    public void setGender(String gender) { this.gender = gender; }
-
     public String getPhone() { return phone; }
-    public void setPhone(String phone) { this.phone = phone; }
-
     public String getAddress() { return address; }
-    public void setAddress(String address) { this.address = address; }
-
     public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
-
     public String getAccountNumber() { return accountNumber; }
-    public void setAccountNumber(String accountNumber) { this.accountNumber = accountNumber; }
-
     public double getBalance() { return balance; }
     public void setBalance(double balance) { this.balance = balance; }
-
     public String getAccountType() { return accountType; }
-    public void setAccountType(String accountType) { this.accountType = accountType; }
-
     public LocalDate getOpeningDate() { return openingDate; }
-    public void setOpeningDate(LocalDate openingDate) { this.openingDate = openingDate; }
 
-    // For backward compatibility - get username (uses first name)
+    // For login authentication
+    public boolean checkPassword(String inputPassword) {
+        return this.password.equals(inputPassword);
+    }
+
+    // For username access
     public String getUsername() {
-        return firstName;
+        return this.firstName;
     }
 
     // For display purposes
@@ -161,20 +130,12 @@ public class Customer {
         return firstName + " " + lastName;
     }
 
-    // Utility methods
     @Override
     public String toString() {
         return "Customer{" +
                 "firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
                 ", accountNumber='" + accountNumber + '\'' +
                 ", balance=" + balance +
-                ", accountType='" + accountType + '\'' +
                 '}';
-    }
-
-    // Method to check if password matches
-    public boolean checkPassword(String inputPassword) {
-        return this.password.equals(inputPassword);
     }
 }

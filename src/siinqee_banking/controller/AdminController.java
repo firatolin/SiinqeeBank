@@ -21,6 +21,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.Separator;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.GridPane;
@@ -55,8 +56,8 @@ public class AdminController {
     @FXML private Button systemReportsBtn;
     @FXML private Button accountTransactionsBtn;
 
-    // Use ObservableList for automatic updates
-    private ObservableList<Customer> customers = FXCollections.observableArrayList();
+    // Use the shared customers list
+    private ObservableList<Customer> customers;
     private Set<String> usedAccountNumbers = new HashSet<>();
     private Random random = new Random();
 
@@ -67,17 +68,20 @@ public class AdminController {
     // Current customer for transactions
     private Customer currentCustomer;
 
+    // Method to set the shared customers list
+    public void setCustomers(ObservableList<Customer> customers) {
+        this.customers = customers;
+        initializeAdminData();
+    }
+
     @FXML
     public void initialize() {
         welcomeLabel.setText("Welcome, Administrator");
 
-        // Initialize with sample data
-        customers.addAll(
-                new Customer("John", "Doe", "Male", "1234567890", "123 Main St, Addis Ababa", "password123",
-                        generateUniqueAccountNumber(), 10000, "Regular", LocalDate.now()),
-                new Customer("Jane", "Smith", "Female", "0987654321", "456 Oak Ave, Dire Dawa", "password456",
-                        generateUniqueAccountNumber(), 5000, "Student", LocalDate.now())
-        );
+        // If customers list is not set yet, initialize with empty list
+        if (customers == null) {
+            customers = FXCollections.observableArrayList();
+        }
 
         // Bind labels to properties
         customerCountLabel.textProperty().bind(Bindings.concat("Customers: ", customerCount));
@@ -88,6 +92,17 @@ public class AdminController {
         // Show add customer form by default and highlight the button
         showAddCustomer();
         highlightActiveButton(addCustomerBtn);
+    }
+
+    // Separate initialization for admin-specific data
+    private void initializeAdminData() {
+        // Initialize used account numbers from existing customers
+        for (Customer customer : customers) {
+            usedAccountNumbers.add(customer.getAccountNumber());
+        }
+
+        updateSidebarStats();
+        System.out.println("AdminController initialized with " + customers.size() + " customers");
     }
 
     // Generate unique 10-digit account number starting with "s"
@@ -105,9 +120,11 @@ public class AdminController {
 
     // Update the sidebar stats
     private void updateSidebarStats() {
-        customerCount.set(customers.size());
-        double balance = customers.stream().mapToDouble(Customer::getBalance).sum();
-        totalBalance.set(balance / 1000); // Convert to K format
+        if (customers != null) {
+            customerCount.set(customers.size());
+            double balance = customers.stream().mapToDouble(Customer::getBalance).sum();
+            totalBalance.set(balance / 1000); // Convert to K format
+        }
     }
 
     // Method to highlight active button and remove highlight from others
@@ -195,7 +212,7 @@ public class AdminController {
         contentArea.getChildren().setAll(scrollPane);
     }
 
-    // Create Add Customer Content with all new fields
+    // Create Add Customer Content
     private VBox createAddCustomerContent() {
         VBox content = new VBox(20);
         content.setStyle("-fx-padding: 30; -fx-alignment: top-center;");
@@ -208,7 +225,7 @@ public class AdminController {
         titleLabel.setStyle("-fx-text-fill: #F4941C; -fx-font-size: 24px; -fx-font-weight: bold;");
 
         Label subtitleLabel = new Label("Create new customer accounts for banking services");
-        subtitleLabel.setStyle("-fx-text-fill: rgb(63, 86, 21); -fx-font-size: 14px;");
+        subtitleLabel.setStyle("-fx-text-fill: #3f5615; -fx-font-size: 14px;");
 
         header.getChildren().addAll(titleLabel, subtitleLabel);
 
@@ -237,7 +254,7 @@ public class AdminController {
 
         // First Name
         Label firstNameLabel = new Label("First Name:");
-        firstNameLabel.setStyle("-fx-text-fill: rgb(63, 86, 21); -fx-font-weight: bold;");
+        firstNameLabel.setStyle("-fx-text-fill: #3f5615; -fx-font-weight: bold;");
         TextField firstNameField = new TextField();
         firstNameField.setPromptText("Enter first name");
         firstNameField.setStyle("-fx-background-radius: 5; -fx-padding: 8;");
@@ -246,7 +263,7 @@ public class AdminController {
 
         // Last Name
         Label lastNameLabel = new Label("Last Name:");
-        lastNameLabel.setStyle("-fx-text-fill: rgb(63, 86, 21); -fx-font-weight: bold;");
+        lastNameLabel.setStyle("-fx-text-fill: #3f5615; -fx-font-weight: bold;");
         TextField lastNameField = new TextField();
         lastNameField.setPromptText("Enter last name");
         lastNameField.setStyle("-fx-background-radius: 5; -fx-padding: 8;");
@@ -255,7 +272,7 @@ public class AdminController {
 
         // Gender (Radio Buttons)
         Label genderLabel = new Label("Gender:");
-        genderLabel.setStyle("-fx-text-fill: rgb(63, 86, 21); -fx-font-weight: bold;");
+        genderLabel.setStyle("-fx-text-fill: #3f5615; -fx-font-weight: bold;");
 
         HBox genderBox = new HBox(15);
         genderBox.setAlignment(Pos.CENTER_LEFT);
@@ -277,7 +294,7 @@ public class AdminController {
 
         // Phone Number
         Label phoneLabel = new Label("Phone Number:");
-        phoneLabel.setStyle("-fx-text-fill: rgb(63, 86, 21); -fx-font-weight: bold;");
+        phoneLabel.setStyle("-fx-text-fill: #3f5615; -fx-font-weight: bold;");
         TextField phoneField = new TextField();
         phoneField.setPromptText("Enter phone number");
         phoneField.setStyle("-fx-background-radius: 5; -fx-padding: 8;");
@@ -286,7 +303,7 @@ public class AdminController {
 
         // Address
         Label addressLabel = new Label("Address:");
-        addressLabel.setStyle("-fx-text-fill: rgb(63, 86, 21); -fx-font-weight: bold;");
+        addressLabel.setStyle("-fx-text-fill: #3f5615; -fx-font-weight: bold;");
         TextArea addressField = new TextArea();
         addressField.setPromptText("Enter full address");
         addressField.setStyle("-fx-background-radius: 5; -fx-padding: 8; -fx-pref-height: 60;");
@@ -302,7 +319,7 @@ public class AdminController {
 
         // Password
         Label passwordLabel = new Label("Password:");
-        passwordLabel.setStyle("-fx-text-fill: rgb(63, 86, 21); -fx-font-weight: bold;");
+        passwordLabel.setStyle("-fx-text-fill: #3f5615; -fx-font-weight: bold;");
         PasswordField passwordField = new PasswordField();
         passwordField.setPromptText("Enter password");
         passwordField.setStyle("-fx-background-radius: 5; -fx-padding: 8;");
@@ -311,7 +328,7 @@ public class AdminController {
 
         // Account Type
         Label accountTypeLabel = new Label("Account Type:");
-        accountTypeLabel.setStyle("-fx-text-fill: rgb(63, 86, 21); -fx-font-weight: bold;");
+        accountTypeLabel.setStyle("-fx-text-fill: #3f5615; -fx-font-weight: bold;");
         ComboBox<String> accountTypeComboBox = new ComboBox<>();
         accountTypeComboBox.getItems().addAll("Children", "Regular", "Student", "Women");
         accountTypeComboBox.setPromptText("Select account type");
@@ -321,7 +338,7 @@ public class AdminController {
 
         // Opening Date
         Label openingDateLabel = new Label("Opening Date:");
-        openingDateLabel.setStyle("-fx-text-fill: rgb(63, 86, 21); -fx-font-weight: bold;");
+        openingDateLabel.setStyle("-fx-text-fill: #3f5615; -fx-font-weight: bold;");
         DatePicker openingDatePicker = new DatePicker();
         openingDatePicker.setValue(LocalDate.now()); // Set default to today
         openingDatePicker.setStyle("-fx-background-radius: 5;");
@@ -331,7 +348,7 @@ public class AdminController {
 
         // Account Number (Auto-generated, display only)
         Label accountNumberLabel = new Label("Account Number:");
-        accountNumberLabel.setStyle("-fx-text-fill: rgb(63, 86, 21); -fx-font-weight: bold;");
+        accountNumberLabel.setStyle("-fx-text-fill: #3f5615; -fx-font-weight: bold;");
         Label accountNumberDisplay = new Label("Will be generated automatically");
         accountNumberDisplay.setStyle("-fx-text-fill: #666; -fx-font-style: italic; -fx-padding: 8; -fx-background-color: #e9ecef; -fx-background-radius: 5;");
         accountNumberDisplay.setPrefWidth(350);
@@ -342,7 +359,7 @@ public class AdminController {
 
         // Opening Balance
         Label balanceLabel = new Label("Opening Balance:");
-        balanceLabel.setStyle("-fx-text-fill: rgb(63, 86, 21); -fx-font-weight: bold;");
+        balanceLabel.setStyle("-fx-text-fill: #3f5615; -fx-font-weight: bold;");
         TextField balanceField = new TextField();
         balanceField.setPromptText("0.00");
         balanceField.setStyle("-fx-background-radius: 5; -fx-padding: 8;");
@@ -397,7 +414,7 @@ public class AdminController {
         tips.setStyle("-fx-padding: 20; -fx-alignment: center;");
 
         Label tipsTitle = new Label("💡 Quick Tips");
-        tipsTitle.setStyle("-fx-text-fill: rgb(63, 86, 21); -fx-font-weight: bold;");
+        tipsTitle.setStyle("-fx-text-fill: #3f5615; -fx-font-weight: bold;");
 
         Label tip1 = new Label("• All fields are required");
         tip1.setStyle("-fx-text-fill: #666; -fx-font-size: 12px;");
@@ -470,7 +487,7 @@ public class AdminController {
         Label bankIcon = new Label("🏦");
         bankIcon.setStyle("-fx-font-size: 24px;");
         Label bankName = new Label("SINQEE BANK");
-        bankName.setStyle("-fx-text-fill: #2f4411; -fx-font-size: 18px; -fx-font-weight: bold;");
+        bankName.setStyle("-fx-text-fill: #3f5615; -fx-font-size: 18px; -fx-font-weight: bold;");
         header.getChildren().addAll(bankIcon, bankName);
 
         // Success icon and message
@@ -488,19 +505,19 @@ public class AdminController {
         detailsBox.setPrefWidth(350);
 
         Label nameLabel = new Label("👤 Customer: " + customerName);
-        nameLabel.setStyle("-fx-text-fill: #2f4411; -fx-font-weight: bold;");
+        nameLabel.setStyle("-fx-text-fill: #3f5615; -fx-font-weight: bold;");
 
         Label accountLabel = new Label("🔢 Account Number: " + accountNumber);
-        accountLabel.setStyle("-fx-text-fill: #2f4411; -fx-font-weight: bold;");
+        accountLabel.setStyle("-fx-text-fill: #3f5615; -fx-font-weight: bold;");
 
         Label typeLabel = new Label("📋 Account Type: " + accountType);
-        typeLabel.setStyle("-fx-text-fill: #2f4411; -fx-font-weight: bold;");
+        typeLabel.setStyle("-fx-text-fill: #3f5615; -fx-font-weight: bold;");
 
         Label dateLabel = new Label("📅 Opening Date: " + openingDate.format(DateTimeFormatter.ofPattern("MMM dd, yyyy")));
-        dateLabel.setStyle("-fx-text-fill: #2f4411; -fx-font-weight: bold;");
+        dateLabel.setStyle("-fx-text-fill: #3f5615; -fx-font-weight: bold;");
 
         Label balanceLabel = new Label("💰 Opening Balance: " + String.format("%.2f ETB", balance));
-        balanceLabel.setStyle("-fx-text-fill: #2f4411; -fx-font-weight: bold;");
+        balanceLabel.setStyle("-fx-text-fill: #3f5615; -fx-font-weight: bold;");
 
         detailsBox.getChildren().addAll(nameLabel, accountLabel, typeLabel, dateLabel, balanceLabel);
 
@@ -528,7 +545,7 @@ public class AdminController {
         titleLabel.setStyle("-fx-text-fill: #F4941C; -fx-font-size: 24px; -fx-font-weight: bold;");
 
         Label subtitleLabel = new Label("View and manage all customer accounts");
-        subtitleLabel.setStyle("-fx-text-fill: rgb(63, 86, 21); -fx-font-size: 14px;");
+        subtitleLabel.setStyle("-fx-text-fill: #3f5615; -fx-font-size: 14px;");
 
         header.getChildren().addAll(titleLabel, subtitleLabel);
 
@@ -538,7 +555,7 @@ public class AdminController {
         accountsTable.setPrefWidth(1000);
 
         Label tableTitle = new Label("Customer Accounts (" + customers.size() + " accounts)");
-        tableTitle.setStyle("-fx-text-fill: rgb(63, 86, 21); -fx-font-weight: bold; -fx-font-size: 16px;");
+        tableTitle.setStyle("-fx-text-fill: #3f5615; -fx-font-weight: bold; -fx-font-size: 16px;");
 
         // Create a table view with all customer details
         TableView<Customer> tableView = new TableView<>();
@@ -625,7 +642,7 @@ public class AdminController {
         return content;
     }
 
-    // Create Transactions Content - FIXED: Now shows actual transactions
+    // Create Transactions Content
     private VBox createTransactionsContent() {
         VBox content = new VBox(20);
         content.setStyle("-fx-padding: 30; -fx-alignment: top-center;");
@@ -638,7 +655,7 @@ public class AdminController {
         titleLabel.setStyle("-fx-text-fill: #F4941C; -fx-font-size: 24px; -fx-font-weight: bold;");
 
         Label subtitleLabel = new Label("View all banking transactions across all accounts");
-        subtitleLabel.setStyle("-fx-text-fill: rgb(63, 86, 21); -fx-font-size: 14px;");
+        subtitleLabel.setStyle("-fx-text-fill: #3f5615; -fx-font-size: 14px;");
 
         header.getChildren().addAll(titleLabel, subtitleLabel);
 
@@ -718,7 +735,7 @@ public class AdminController {
         titleLabel.setStyle("-fx-text-fill: #F4941C; -fx-font-size: 24px; -fx-font-weight: bold;");
 
         Label subtitleLabel = new Label("Bank performance and analytics");
-        subtitleLabel.setStyle("-fx-text-fill: rgb(63, 86, 21); -fx-font-size: 14px;");
+        subtitleLabel.setStyle("-fx-text-fill: #3f5615; -fx-font-size: 14px;");
 
         header.getChildren().addAll(titleLabel, subtitleLabel);
 
@@ -832,7 +849,7 @@ public class AdminController {
         titleLabel.setStyle("-fx-text-fill: #F4941C; -fx-font-size: 24px; -fx-font-weight: bold;");
 
         Label subtitleLabel = new Label("Search accounts and perform transactions");
-        subtitleLabel.setStyle("-fx-text-fill: rgb(63, 86, 21); -fx-font-size: 14px;");
+        subtitleLabel.setStyle("-fx-text-fill: #3f5615; -fx-font-size: 14px;");
 
         header.getChildren().addAll(titleLabel, subtitleLabel);
 
@@ -844,7 +861,7 @@ public class AdminController {
         // Search Section
         VBox searchSection = new VBox(10);
         Label searchLabel = new Label("Search Account by Account Number");
-        searchLabel.setStyle("-fx-text-fill: rgb(63, 86, 21); -fx-font-weight: bold; -fx-font-size: 16px;");
+        searchLabel.setStyle("-fx-text-fill: #3f5615; -fx-font-weight: bold; -fx-font-size: 16px;");
 
         HBox searchBox = new HBox(15);
         searchBox.setAlignment(Pos.CENTER_LEFT);
@@ -889,22 +906,22 @@ public class AdminController {
 
         // Customer details
         Label nameLabel = new Label("Full Name:");
-        nameLabel.setStyle("-fx-text-fill: rgb(63, 86, 21); -fx-font-weight: bold;");
+        nameLabel.setStyle("-fx-text-fill: #3f5615; -fx-font-weight: bold;");
         Label nameValue = new Label();
         nameValue.setStyle("-fx-text-fill: #333; -fx-font-weight: bold;");
 
         Label accountLabel = new Label("Account Number:");
-        accountLabel.setStyle("-fx-text-fill: rgb(63, 86, 21); -fx-font-weight: bold;");
+        accountLabel.setStyle("-fx-text-fill: #3f5615; -fx-font-weight: bold;");
         Label accountValue = new Label();
         accountValue.setStyle("-fx-text-fill: #333; -fx-font-weight: bold;");
 
         Label balanceLabel = new Label("Current Balance:");
-        balanceLabel.setStyle("-fx-text-fill: rgb(63, 86, 21); -fx-font-weight: bold;");
+        balanceLabel.setStyle("-fx-text-fill: #3f5615; -fx-font-weight: bold;");
         Label balanceValue = new Label();
         balanceValue.setStyle("-fx-text-fill: #F4941C; -fx-font-size: 18px; -fx-font-weight: bold;");
 
         Label phoneLabel = new Label("Phone Number:");
-        phoneLabel.setStyle("-fx-text-fill: rgb(63, 86, 21); -fx-font-weight: bold;");
+        phoneLabel.setStyle("-fx-text-fill: #3f5615; -fx-font-weight: bold;");
         Label phoneValue = new Label();
         phoneValue.setStyle("-fx-text-fill: #333; -fx-font-weight: bold;");
 
@@ -1080,9 +1097,7 @@ public class AdminController {
             balanceLabel.setText(String.format("ETB%.2f", currentCustomer.getBalance()));
             depositField.clear();
 
-            showTransactionSuccessAlert("Deposit Successful", "💰",
-                    String.format("ETB%.2f deposited to %s's account", amount, currentCustomer.getFullName()),
-                    String.format("New Balance: ETB%.2f", currentCustomer.getBalance()));
+            showAlert("Success", "Deposit of " + amount + " ETB completed successfully!");
 
             updateSidebarStats();
 
@@ -1108,9 +1123,7 @@ public class AdminController {
                 balanceLabel.setText(String.format("ETB%.2f", currentCustomer.getBalance()));
                 withdrawField.clear();
 
-                showTransactionSuccessAlert("Withdrawal Successful", "💳",
-                        String.format("ETB%.2f withdrawn from %s's account", amount, currentCustomer.getFullName()),
-                        String.format("Remaining Balance: ETB%.2f", currentCustomer.getBalance()));
+                showAlert("Success", "Withdrawal of " + amount + " ETB completed successfully!");
 
                 updateSidebarStats();
             } else {
@@ -1147,16 +1160,18 @@ public class AdminController {
 
         try {
             double amount = Double.parseDouble(amountText);
+            if (amount <= 0) {
+                showAlert("Error", "Amount must be positive.");
+                return;
+            }
+
+            // Use the existing transfer method from Customer class
             if (currentCustomer.transfer(recipient, amount)) {
                 balanceLabel.setText(String.format("ETB%.2f", currentCustomer.getBalance()));
                 recipientField.clear();
                 transferField.clear();
 
-                showTransactionSuccessAlert("Transfer Successful", "🔄",
-                        String.format("ETB%.2f transferred from %s to %s",
-                                amount, currentCustomer.getFullName(), recipient.getFullName()),
-                        String.format("Your Balance: ETB%.2f\nRecipient Balance: ETB%.2f",
-                                currentCustomer.getBalance(), recipient.getBalance()));
+                showAlert("Success", "Transfer of " + amount + " ETB to " + recipient.getFullName() + " completed successfully!");
 
                 updateSidebarStats();
             } else {
@@ -1169,66 +1184,14 @@ public class AdminController {
     }
 
     private Customer findCustomerByAccountNumber(String accountNumber) {
-        for (Customer customer : customers) {
-            if (customer.getAccountNumber().equals(accountNumber)) {
-                return customer;
+        if (customers != null) {
+            for (Customer customer : customers) {
+                if (customer.getAccountNumber().equals(accountNumber)) {
+                    return customer;
+                }
             }
         }
         return null;
-    }
-
-    // Custom transaction success alert with branding
-    private void showTransactionSuccessAlert(String title, String icon, String message, String details) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-
-        // Create custom dialog pane with branding
-        VBox content = new VBox(20);
-        content.setStyle("-fx-background-color: #f8f9fa; -fx-padding: 20; -fx-alignment: center;");
-
-        // Bank branding header
-        HBox header = new HBox(10);
-        header.setAlignment(Pos.CENTER);
-        Label bankIcon = new Label("🏦");
-        bankIcon.setStyle("-fx-font-size: 24px;");
-        Label bankName = new Label("SINQEE BANK");
-        bankName.setStyle("-fx-text-fill: #2f4411; -fx-font-size: 18px; -fx-font-weight: bold;");
-        header.getChildren().addAll(bankIcon, bankName);
-
-        // Success icon and message
-        VBox successBox = new VBox(10);
-        successBox.setAlignment(Pos.CENTER);
-        Label successIcon = new Label(icon);
-        successIcon.setStyle("-fx-font-size: 48px;");
-        Label successTitle = new Label(title);
-        successTitle.setStyle("-fx-text-fill: #F4941C; -fx-font-size: 20px; -fx-font-weight: bold;");
-        successBox.getChildren().addAll(successIcon, successTitle);
-
-        // Transaction details
-        VBox detailsBox = new VBox(8);
-        detailsBox.setStyle("-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 10; -fx-alignment: center;");
-        detailsBox.setPrefWidth(350);
-
-        Label messageLabel = new Label(message);
-        messageLabel.setStyle("-fx-text-fill: #2f4411; -fx-font-weight: bold; -fx-font-size: 14px; -fx-alignment: center;");
-        messageLabel.setWrapText(true);
-
-        Label detailsLabel = new Label(details);
-        detailsLabel.setStyle("-fx-text-fill: #F4941C; -fx-font-weight: bold; -fx-font-size: 16px; -fx-alignment: center;");
-        detailsLabel.setWrapText(true);
-
-        detailsBox.getChildren().addAll(messageLabel, detailsLabel);
-
-        // Footer message
-        Label footer = new Label("Transaction completed successfully! ✅");
-        footer.setStyle("-fx-text-fill: #666; -fx-font-size: 12px; -fx-font-style: italic;");
-
-        content.getChildren().addAll(header, successBox, detailsBox, footer);
-
-        alert.getDialogPane().setContent(content);
-        alert.getDialogPane().setPrefSize(400, 400);
-        alert.showAndWait();
     }
 
     @FXML
@@ -1246,16 +1209,16 @@ public class AdminController {
         }
     }
 
+    // Getter for customers list
+    public ObservableList<Customer> getCustomers() {
+        return customers;
+    }
+
     private void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
-    }
-
-    // Getter for customers list
-    public ObservableList<Customer> getCustomers() {
-        return customers;
     }
 }
