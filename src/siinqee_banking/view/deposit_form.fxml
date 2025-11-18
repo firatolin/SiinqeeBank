@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<StackPane xmlns:fx="http://javafx.com/fxml"
+           fx:controller="siinqee_banking.controller.DepositController"
+           stylesheets="@../css/style.css">
+    <VBox alignment="CENTER" spacing="12" maxWidth="600" style="-fx-padding: 40;">
+        <Label text="Deposit Money" style="-fx-font-size: 20px; -fx-font-weight:bold; -fx-text-fill:#F4941C;"/>
+        <TextField fx:id="amountField" promptText="Enter amount" maxWidth="Infinity"/>
+        <Button text="Deposit" onAction="#handleDeposit" styleClass="dashboard-btn" maxWidth="Infinity"/>
+    </VBox>
+</StackPane>

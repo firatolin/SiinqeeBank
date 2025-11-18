@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      styleClass="main-container"
+      stylesheets="@../css/style.css"
+      spacing="20">
+
+    <padding><Insets top="30" right="30" bottom="30" left="30"/></padding>
+
+    <Label text="Transaction History" styleClass="main-header"/>
+
+    <HBox spacing="15" alignment="CENTER_LEFT">
+        <TextField promptText="Search by account..." styleClass="input-field" prefWidth="250"/>
+        <ComboBox promptText="Filter by type" styleClass="input-field" prefWidth="150"/>
+        <DatePicker promptText="From date" styleClass="input-field"/>
+        <DatePicker promptText="To date" styleClass="input-field"/>
+        <Button text="Search" styleClass="primary-button"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button text="Export Report" styleClass="secondary-button"/>
+    </HBox>
+
+    <TableView styleClass="data-table" prefHeight="400">
+        <columns>
+            <TableColumn text="Transaction ID" prefWidth="120"/>
+            <TableColumn text="Account" prefWidth="150"/>
+            <TableColumn text="Type" prefWidth="100"/>
+            <TableColumn text="Amount" prefWidth="120"/>
+            <TableColumn text="Description" prefWidth="200"/>
+            <TableColumn text="Date & Time" prefWidth="180"/>
+            <TableColumn text="Status" prefWidth="100"/>
+        </columns>
+    </TableView>
+
+    <HBox spacing="20" alignment="CENTER">
+        <VBox styleClass="highlight-card" spacing="5" prefWidth="200">
+            <Label text="Total Transactions" styleClass="stat-label"/>
+            <Label text="1,247" styleClass="stat-number"/>
+        </VBox>
+        <VBox styleClass="info-card" spacing="5" prefWidth="200">
+            <Label text="Today" styleClass="stat-label"/>
+            <Label text="15" styleClass="stat-number"/>
+        </VBox>
+        <VBox styleClass="info-card" spacing="5" prefWidth="200">
+            <Label text="This Month" styleClass="stat-label"/>
+            <Label text="284" styleClass="stat-number"/>
+        </VBox>
+    </HBox>
+</VBox>

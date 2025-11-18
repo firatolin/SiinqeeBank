@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<StackPane xmlns:fx="http://javafx.com/fxml"
+           fx:controller="siinqee_banking.controller.LoginController"
+           styleClass="main-container"
+           stylesheets="@../css/style.css">
+
+    <VBox alignment="CENTER" spacing="30">
+        <!-- Logo Section -->
+        <VBox alignment="CENTER" spacing="15">
+            <StackPane styleClass="logo-container">
+                <ImageView fx:id="logoImage" fitWidth="120" fitHeight="120" pickOnBounds="true" preserveRatio="true">
+                    <image>
+                        <Image url="@../images/logo.png" />
+                    </image>
+                </ImageView>
+            </StackPane>
+            <Label text="SINQEE BANK" styleClass="main-header"/>
+            <Label text="Secure Banking Management System" style="-fx-text-fill: white; -fx-font-size: 16px;"/>
+        </VBox>
+
+        <!-- Login Form -->
+        <VBox styleClass="content-pane" spacing="20" alignment="CENTER" maxWidth="400">
+            <padding><Insets top="30" right="30" bottom="30" left="30"/></padding>
+
+            <Label text="Welcome Back" styleClass="sub-header"/>
+
+            <VBox spacing="15" style="-fx-pref-width: 300;">
+                <TextField fx:id="usernameField" promptText="Enter your username" styleClass="input-field"/>
+                <PasswordField fx:id="passwordField" promptText="Enter your password" styleClass="input-field"/>
+
+                <Button text="Sign In" onAction="#handleLogin" styleClass="primary-button" maxWidth="Infinity"/>
+            </VBox>
+        </VBox>
+    </VBox>
+
+</StackPane>
