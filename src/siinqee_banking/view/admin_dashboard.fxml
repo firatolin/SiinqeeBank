@@ -10,7 +10,7 @@
     <!-- Top Header -->
     <top>
         <VBox style="-fx-background-color: rgb(63, 86, 21);">
-            <HBox alignment="CENTER_LEFT" style="-fx-padding: 15;">
+            <HBox fx:id="headerBox" alignment="CENTER_LEFT" style="-fx-padding: 15;">
                 <HBox spacing="10" alignment="CENTER_LEFT">
                     <Label fx:id="welcomeLabel" text="Welcome, Admin"
                            style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;"/>

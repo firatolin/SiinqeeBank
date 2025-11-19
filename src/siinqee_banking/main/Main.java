@@ -14,9 +14,7 @@ public class Main extends Application {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/siinqee_banking/view/login.fxml"));
         Parent root = loader.load();
 
-        // Get the controller and initialize customer data
-        LoginController loginController = loader.getController();
-        loginController.initializeCustomerData();
+
 
         primaryStage.setTitle("Sinqee Bank Login");
         primaryStage.setScene(new Scene(root));

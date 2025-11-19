@@ -64,13 +64,23 @@
                         <Label text="Account Number:" styleClass="info-label" GridPane.rowIndex="2"/>
                         <Label fx:id="accountNumberDetailLabel" text="-" style="-fx-font-weight: bold; -fx-text-fill: #3f5615;" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
 
+                        <!-- Phone -->
+                        <Label text="Phone:" styleClass="info-label" GridPane.rowIndex="3"/>
+                        <Label fx:id="phoneLabel" text="-" style="-fx-font-weight: bold;" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+                        <!-- Address -->
+                        <Label text="Address:" styleClass="info-label" GridPane.rowIndex="4"/>
+                        <Label fx:id="addressLabel" text="-" style="-fx-font-weight: bold;" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+
+                        <!-- Opening Date -->
+                        <Label text="Opening Date:" styleClass="info-label" GridPane.rowIndex="5"/>
+                        <Label fx:id="openingDateLabel" text="-" style="-fx-font-weight: bold;" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+
+                        <!-- Gender -->
+                        <Label text="Gender:" styleClass="info-label" GridPane.rowIndex="6"/>
+                        <Label fx:id="genderLabel" text="-" style="-fx-font-weight: bold;" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
                     </GridPane>
                 </VBox>
-
-                <!-- Quick Actions -->
-                <HBox spacing="20" alignment="CENTER">
-                    <Button text="💰 Check Balance" onAction="#handleCheckBalance" styleClass="primary-button" prefWidth="180"/>
-                </HBox>
 
                 <!-- Transfer Funds -->
                 <VBox styleClass="content-pane" spacing="15">

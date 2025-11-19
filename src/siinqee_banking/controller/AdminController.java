@@ -21,7 +21,6 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.control.Separator;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.GridPane;
@@ -31,6 +30,8 @@ import javafx.scene.Scene;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Pos;
 import javafx.geometry.Insets;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import siinqee_banking.model.Customer;
 import siinqee_banking.model.Transaction;
 
@@ -48,6 +49,7 @@ public class AdminController {
     @FXML private Label customerCountLabel;
     @FXML private Label totalBalanceLabel;
     @FXML private StackPane contentArea;
+    @FXML private HBox headerBox;
 
     // Sidebar buttons
     @FXML private Button addCustomerBtn;
@@ -68,15 +70,12 @@ public class AdminController {
     // Current customer for transactions
     private Customer currentCustomer;
 
-    // Method to set the shared customers list
-    public void setCustomers(ObservableList<Customer> customers) {
-        this.customers = customers;
-        initializeAdminData();
-    }
-
     @FXML
     public void initialize() {
         welcomeLabel.setText("Welcome, Administrator");
+
+        // Add logo to header
+        addLogoToHeader();
 
         // If customers list is not set yet, initialize with empty list
         if (customers == null) {
@@ -92,6 +91,31 @@ public class AdminController {
         // Show add customer form by default and highlight the button
         showAddCustomer();
         highlightActiveButton(addCustomerBtn);
+    }
+
+    private void addLogoToHeader() {
+        try {
+            Image logoImage = new Image(getClass().getResourceAsStream("/siinqee_banking/images/logo.png"));
+            ImageView logoView = new ImageView(logoImage);
+            logoView.setFitHeight(40);
+            logoView.setFitWidth(40);
+            logoView.setPreserveRatio(true);
+
+            StackPane logoContainer = new StackPane(logoView);
+            logoContainer.setStyle("-fx-background-color: #FFD700; -fx-background-radius: 8; -fx-padding: 5;");
+            logoContainer.setMaxSize(50, 50);
+
+            // Add logo to the beginning of header
+            headerBox.getChildren().add(0, logoContainer);
+        } catch (Exception e) {
+            System.out.println("Logo not found, continuing without logo");
+        }
+    }
+
+    // Method to set the shared customers list
+    public void setCustomers(ObservableList<Customer> customers) {
+        this.customers = customers;
+        initializeAdminData();
     }
 
     // Separate initialization for admin-specific data
@@ -330,7 +354,7 @@ public class AdminController {
         Label accountTypeLabel = new Label("Account Type:");
         accountTypeLabel.setStyle("-fx-text-fill: #3f5615; -fx-font-weight: bold;");
         ComboBox<String> accountTypeComboBox = new ComboBox<>();
-        accountTypeComboBox.getItems().addAll("Children", "Regular", "Student", "Women");
+        accountTypeComboBox.getItems().addAll("Siinqee IHSAN", "Children", "Regular", "Student", "Women","Youth");
         accountTypeComboBox.setPromptText("Select account type");
         accountTypeComboBox.setStyle("-fx-background-radius: 5; -fx-padding: 8;");
         form.add(accountTypeLabel, 0, 8);
@@ -361,7 +385,7 @@ public class AdminController {
         Label balanceLabel = new Label("Opening Balance:");
         balanceLabel.setStyle("-fx-text-fill: #3f5615; -fx-font-weight: bold;");
         TextField balanceField = new TextField();
-        balanceField.setPromptText("0.00");
+        balanceField.setPromptText("Minimum 50.00 ETB");
         balanceField.setStyle("-fx-background-radius: 5; -fx-padding: 8;");
         form.add(balanceLabel, 0, 11);
         form.add(balanceField, 1, 11);
@@ -422,7 +446,7 @@ public class AdminController {
         Label tip2 = new Label("• Account number is automatically generated");
         tip2.setStyle("-fx-text-fill: #666; -fx-font-size: 12px;");
 
-        Label tip3 = new Label("• Password should be secure");
+        Label tip3 = new Label("• Minimum opening balance is 50.00 ETB");
         tip3.setStyle("-fx-text-fill: #666; -fx-font-size: 12px;");
 
         tips.getChildren().addAll(tipsTitle, tip1, tip2, tip3);
@@ -452,8 +476,8 @@ public class AdminController {
 
         try {
             double openingBalance = Double.parseDouble(balanceText);
-            if (openingBalance < 0) {
-                showAlert("Error", "Opening balance cannot be negative.");
+            if (openingBalance < 50.0) {
+                showAlert("Error", "Opening balance must be at least 50.00 ETB.");
                 return;
             }
 
@@ -552,7 +576,7 @@ public class AdminController {
         // Accounts Table
         VBox accountsTable = new VBox(15);
         accountsTable.setStyle("-fx-background-color: #f8f9fa; -fx-padding: 25; -fx-background-radius: 10;");
-        accountsTable.setPrefWidth(1000);
+        accountsTable.setPrefWidth(1100); // Increased width to accommodate password column
 
         Label tableTitle = new Label("Customer Accounts (" + customers.size() + " accounts)");
         tableTitle.setStyle("-fx-text-fill: #3f5615; -fx-font-weight: bold; -fx-font-size: 16px;");
@@ -581,6 +605,25 @@ public class AdminController {
         TableColumn<Customer, String> typeCol = new TableColumn<>("Account Type");
         typeCol.setCellValueFactory(new PropertyValueFactory<>("accountType"));
         typeCol.setPrefWidth(100);
+
+        // Password Column - NEW (Option 1: Show dots with tooltip)
+        TableColumn<Customer, String> passwordCol = new TableColumn<>("Password");
+        passwordCol.setCellValueFactory(new PropertyValueFactory<>("password"));
+        passwordCol.setPrefWidth(120);
+        passwordCol.setCellFactory(col -> new TableCell<Customer, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    setText("••••••••"); // Show dots instead of actual password
+                    setTooltip(new javafx.scene.control.Tooltip("Password: " + item));
+                    setStyle("-fx-text-fill: #666; -fx-font-family: 'Monospace';");
+                }
+            }
+        });
 
         TableColumn<Customer, String> phoneCol = new TableColumn<>("Phone");
         phoneCol.setCellValueFactory(new PropertyValueFactory<>("phone"));
@@ -633,7 +676,8 @@ public class AdminController {
             }
         });
 
-        tableView.getColumns().addAll(firstNameCol, lastNameCol, genderCol, accountCol, typeCol, phoneCol, addressCol, dateCol, balanceCol);
+        // Add all columns including the password column
+        tableView.getColumns().addAll(firstNameCol, lastNameCol, genderCol, accountCol, typeCol, passwordCol, phoneCol, addressCol, dateCol, balanceCol);
         tableView.setItems(customers);
 
         accountsTable.getChildren().addAll(tableTitle, tableView);
@@ -915,6 +959,11 @@ public class AdminController {
         Label accountValue = new Label();
         accountValue.setStyle("-fx-text-fill: #333; -fx-font-weight: bold;");
 
+        Label accountTypeLabel = new Label("Account Type:");
+        accountTypeLabel.setStyle("-fx-text-fill: #3f5615; -fx-font-weight: bold;");
+        Label accountTypeValue = new Label();
+        accountTypeValue.setStyle("-fx-text-fill: #333; -fx-font-weight: bold;");
+
         Label balanceLabel = new Label("Current Balance:");
         balanceLabel.setStyle("-fx-text-fill: #3f5615; -fx-font-weight: bold;");
         Label balanceValue = new Label();
@@ -930,10 +979,12 @@ public class AdminController {
         customerGrid.add(nameValue, 1, 0);
         customerGrid.add(accountLabel, 0, 1);
         customerGrid.add(accountValue, 1, 1);
-        customerGrid.add(balanceLabel, 0, 2);
-        customerGrid.add(balanceValue, 1, 2);
-        customerGrid.add(phoneLabel, 0, 3);
-        customerGrid.add(phoneValue, 1, 3);
+        customerGrid.add(accountTypeLabel, 0, 2);
+        customerGrid.add(accountTypeValue, 1, 2);
+        customerGrid.add(balanceLabel, 0, 3);
+        customerGrid.add(balanceValue, 1, 3);
+        customerGrid.add(phoneLabel, 0, 4);
+        customerGrid.add(phoneValue, 1, 4);
 
         customerInfoDisplay.getChildren().addAll(customerInfoLabel, customerGrid);
 
@@ -1008,7 +1059,7 @@ public class AdminController {
         searchBtn.setOnAction(e -> {
             String accountNumber = searchField.getText().trim();
             handleSearchAccount(accountNumber, customerInfoDisplay, transactionOperations,
-                    nameValue, accountValue, balanceValue, phoneValue);
+                    nameValue, accountValue, accountTypeValue, balanceValue, phoneValue);
         });
 
         clearBtn.setOnAction(e -> {
@@ -1047,7 +1098,7 @@ public class AdminController {
 
     // Transaction handling methods
     private void handleSearchAccount(String accountNumber, VBox customerInfoDisplay, VBox transactionOperations,
-                                     Label nameLabel, Label accountLabel, Label balanceLabel, Label phoneLabel) {
+                                     Label nameLabel, Label accountLabel, Label accountTypeLabel, Label balanceLabel, Label phoneLabel) {
         if (accountNumber.isEmpty()) {
             showAlert("Error", "Please enter an account number.");
             return;
@@ -1063,6 +1114,7 @@ public class AdminController {
             // Display customer information
             nameLabel.setText(currentCustomer.getFullName());
             accountLabel.setText(currentCustomer.getAccountNumber());
+            accountTypeLabel.setText(currentCustomer.getAccountType());
             balanceLabel.setText(String.format("ETB%.2f", currentCustomer.getBalance()));
             phoneLabel.setText(currentCustomer.getPhone());
 
@@ -1097,7 +1149,7 @@ public class AdminController {
             balanceLabel.setText(String.format("ETB%.2f", currentCustomer.getBalance()));
             depositField.clear();
 
-            showAlert("Success", "Deposit of " + amount + " ETB completed successfully!");
+            showBrandedAlert("Success", "Deposit of " + String.format("ETB%.2f", amount) + " completed successfully!", "✅", "#27ae60");
 
             updateSidebarStats();
 
@@ -1123,7 +1175,7 @@ public class AdminController {
                 balanceLabel.setText(String.format("ETB%.2f", currentCustomer.getBalance()));
                 withdrawField.clear();
 
-                showAlert("Success", "Withdrawal of " + amount + " ETB completed successfully!");
+                showBrandedAlert("Success", "Withdrawal of " + String.format("ETB%.2f", amount) + " completed successfully!", "✅", "#27ae60");
 
                 updateSidebarStats();
             } else {
@@ -1171,7 +1223,7 @@ public class AdminController {
                 recipientField.clear();
                 transferField.clear();
 
-                showAlert("Success", "Transfer of " + amount + " ETB to " + recipient.getFullName() + " completed successfully!");
+                showBrandedAlert("Success", "Transfer of " + String.format("ETB%.2f", amount) + " to " + recipient.getFullName() + " completed successfully!", "✅", "#27ae60");
 
                 updateSidebarStats();
             } else {
@@ -1181,6 +1233,39 @@ public class AdminController {
         } catch (NumberFormatException e) {
             showAlert("Error", "Please enter a valid amount.");
         }
+    }
+
+    private void showBrandedAlert(String title, String message, String icon, String color) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+
+        VBox content = new VBox(15);
+        content.setStyle("-fx-background-color: #f8f9fa; -fx-padding: 20; -fx-alignment: center;");
+
+        // Header with bank branding
+        HBox header = new HBox(10);
+        header.setAlignment(Pos.CENTER);
+        Label bankIcon = new Label("🏦");
+        bankIcon.setStyle("-fx-font-size: 24px;");
+        Label bankName = new Label("SINQEE BANK");
+        bankName.setStyle("-fx-text-fill: #3f5615; -fx-font-size: 16px; -fx-font-weight: bold;");
+        header.getChildren().addAll(bankIcon, bankName);
+
+        // Alert icon and message
+        HBox messageBox = new HBox(10);
+        messageBox.setAlignment(Pos.CENTER);
+        Label alertIcon = new Label(icon);
+        alertIcon.setStyle("-fx-font-size: 32px;");
+        Label messageLabel = new Label(message);
+        messageLabel.setStyle("-fx-text-fill: " + color + "; -fx-font-weight: bold; -fx-font-size: 14px;");
+        messageBox.getChildren().addAll(alertIcon, messageLabel);
+
+        content.getChildren().addAll(header, messageBox);
+
+        alert.getDialogPane().setContent(content);
+        alert.getDialogPane().setPrefSize(350, 200);
+        alert.showAndWait();
     }
 
     private Customer findCustomerByAccountNumber(String accountNumber) {

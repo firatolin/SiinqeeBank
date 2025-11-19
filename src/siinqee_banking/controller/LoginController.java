@@ -62,24 +62,7 @@ public class LoginController {
         }
     }
 
-    // This method should be called when the application starts to initialize customer data
-    public void initializeCustomerData() {
-        // Only initialize if empty (to avoid duplicates when returning from admin)
-        if (allCustomers.isEmpty()) {
-            // Initialize with some sample customers using the simple constructor
-            allCustomers.addAll(
-                    new Customer("John", "john123", 10000.0),
-                    new Customer("Alice", "alice123", 5000.0),
-                    new Customer("Bob", "bob123", 7500.0),
-                    new Customer("Emma", "emma123", 4200.0)
-            );
 
-            System.out.println("Initialized " + allCustomers.size() + " customers in LoginController");
-            for (Customer customer : allCustomers) {
-                System.out.println(" - " + customer.getFirstName() + " | Phone: " + customer.getPhone() + " | Address: " + customer.getAddress());
-            }
-        }
-    }
 
     private void loadAdminDashboard() {
         try {

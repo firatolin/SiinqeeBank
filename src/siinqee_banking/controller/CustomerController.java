@@ -13,8 +13,11 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import siinqee_banking.model.Customer;
 import siinqee_banking.model.Transaction;
 
@@ -31,6 +34,7 @@ public class CustomerController {
     @FXML private Label welcomeLabel;
     @FXML private Label accountNumberLabel; // Header account number
     @FXML private Label balanceLabel;
+    @FXML private HBox headerBox;
 
     // Account overview labels
     @FXML private Label fullNameLabel;
@@ -42,7 +46,7 @@ public class CustomerController {
     @FXML private Label genderLabel; // Added gender label
 
     // Header section with better spacing
-    @FXML private HBox headerBox;
+    @FXML private HBox headerContainer;
     @FXML private VBox welcomeBox;
     @FXML private VBox balanceBox;
     @FXML private VBox logoutBox;
@@ -63,10 +67,13 @@ public class CustomerController {
     private Customer customer;
     private ObservableList<Customer> allCustomers;
 
-    // Initialize method to check FXML injection
     @FXML
     public void initialize() {
         System.out.println("CustomerController initialized!");
+
+        // Add logo to header
+        addLogoToHeader();
+
         System.out.println("welcomeLabel: " + (welcomeLabel != null ? "INJECTED" : "NULL"));
         System.out.println("fullNameLabel: " + (fullNameLabel != null ? "INJECTED" : "NULL"));
         System.out.println("accountTypeLabel: " + (accountTypeLabel != null ? "INJECTED" : "NULL"));
@@ -75,6 +82,25 @@ public class CustomerController {
         System.out.println("addressLabel: " + (addressLabel != null ? "INJECTED" : "NULL"));
         System.out.println("openingDateLabel: " + (openingDateLabel != null ? "INJECTED" : "NULL"));
         System.out.println("genderLabel: " + (genderLabel != null ? "INJECTED" : "NULL"));
+    }
+
+    private void addLogoToHeader() {
+        try {
+            Image logoImage = new Image(getClass().getResourceAsStream("/siinqee_banking/images/logo.png"));
+            ImageView logoView = new ImageView(logoImage);
+            logoView.setFitHeight(40);
+            logoView.setFitWidth(40);
+            logoView.setPreserveRatio(true);
+
+            StackPane logoContainer = new StackPane(logoView);
+            logoContainer.setStyle("-fx-background-color: #FFD700; -fx-background-radius: 8; -fx-padding: 5;");
+            logoContainer.setMaxSize(50, 50);
+
+            // Add logo to the beginning of header
+            headerBox.getChildren().add(0, logoContainer);
+        } catch (Exception e) {
+            System.out.println("Logo not found, continuing without logo");
+        }
     }
 
     public void setCustomer(Customer customer) {
@@ -98,9 +124,9 @@ public class CustomerController {
 
     private void setupHeaderSpacing() {
         // Add proper spacing between header elements
-        if (headerBox != null) {
-            headerBox.setSpacing(40);
-            headerBox.setStyle("-fx-padding: 20px; -fx-alignment: center;");
+        if (headerContainer != null) {
+            headerContainer.setSpacing(40);
+            headerContainer.setStyle("-fx-padding: 20px; -fx-alignment: center;");
         }
 
         // Style individual boxes for better appearance with correct colors
@@ -144,7 +170,12 @@ public class CustomerController {
             if (accountNumberDetailLabel != null) {
                 accountNumberDetailLabel.setText(customer.getAccountNumber());
             }
-
+            if (phoneLabel != null) {
+                phoneLabel.setText(customer.getPhone() != null ? customer.getPhone() : "Not provided");
+            }
+            if (addressLabel != null) {
+                addressLabel.setText(customer.getAddress() != null ? customer.getAddress() : "Not provided");
+            }
             if (openingDateLabel != null) {
                 openingDateLabel.setText(customer.getOpeningDate().format(DateTimeFormatter.ofPattern("MMM dd, yyyy")));
             }
@@ -174,15 +205,6 @@ public class CustomerController {
     }
 
     @FXML
-    private void handleCheckBalance() {
-        if (customer != null) {
-            showBrandedAlert("Balance Information",
-                    "Current Balance: " + String.format("ETB %.2f", customer.getBalance()),
-                    "💰", PRIMARY_COLOR);
-        }
-    }
-
-    @FXML
     private void handleSearchRecipient() {
         String recipientAccount = recipientAccountField.getText().trim();
 
@@ -200,7 +222,7 @@ public class CustomerController {
         // Search for recipient in all customers
         Customer recipient = findCustomerByAccountNumber(recipientAccount);
         if (recipient != null) {
-            recipientNameLabel.setText(recipient.getFullName() + " (" + recipient.getAccountType() + ")");
+            recipientNameLabel.setText(recipient.getFullName()); // Only show name, not account type
             recipientInfoBox.setVisible(true);
             recipientInfoBox.setStyle("-fx-background-color: #e8f5e8; -fx-padding: 10px; -fx-background-radius: 5;");
         } else {
@@ -435,21 +457,6 @@ public class CustomerController {
             e.printStackTrace();
             showBrandedAlert("Error", "Could not load transactions.", "❌", "#dc3545");
         }
-    }
-
-    @FXML
-    private void handleViewAccountDetails() {
-        showBrandedAlert("Account Information",
-                "You are currently viewing your account details.\n\n" +
-                        "Name: " + customer.getFullName() + "\n" +
-                        "Account Number: " + customer.getAccountNumber() + "\n" +
-                        "Account Type: " + customer.getAccountType() + "\n" +
-                        "Gender: " + (customer.getGender() != null ? customer.getGender() : "Not provided") + "\n" +
-                        "Phone: " + (customer.getPhone() != null ? customer.getPhone() : "Not provided") + "\n" +
-                        "Address: " + (customer.getAddress() != null ? customer.getAddress() : "Not provided") + "\n" +
-                        "Opening Date: " + customer.getOpeningDate().format(DateTimeFormatter.ofPattern("MMM dd, yyyy")) + "\n" +
-                        "Current Balance: " + String.format("ETB %.2f", customer.getBalance()),
-                "👤", PRIMARY_COLOR);
     }
 
     @FXML
